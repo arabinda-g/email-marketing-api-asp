@@ -22,11 +22,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 
-
-
-
-
-
 //Configure JWT authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -50,12 +45,6 @@ builder.Services.AddAuthorization();
 // Add configuration from appsettings.json
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
-
-
-
-
-
-
 
 
 

@@ -1,75 +1,72 @@
-﻿namespace EmailMarketingWebApi.Controllers
+﻿using EmailMarketingWebApi.Data;
+using EmailMarketingWebApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace EmailMarketingWebApi.Controllers
 {
-    using EmailMarketingWebApi.Models;
-    using EmailMarketingWebApi.Services;
-    using EmailMarketingWebApi.ViewModels;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.IdentityModel.Tokens;
-    using System;
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Security.Claims;
-    using System.Text;
-    using System.Threading.Tasks;
-
-
-    [Route("api/[controller]")]
+    [Route("api/token")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        IConfiguration configuration;
-        public AuthController(IConfiguration configuration)
+        public IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
+
+        public AuthController(IConfiguration config, ApplicationDbContext context)
         {
-            this.configuration = configuration;
+            _configuration = config;
+            _context = context;
         }
 
-        [AllowAnonymous]
         [HttpPost]
-        public IActionResult Auth([FromBody] User user)
+        public async Task<IActionResult> Post(User _userData)
         {
-            IActionResult response = Unauthorized();
-
-            if (user != null)
+            if (_userData != null && _userData.Email != null && _userData.Password != null)
             {
-                if (user.UserName.Equals("test@email.com") && user.Password.Equals("a"))
+                var user = await GetUser(_userData.Email, _userData.Password);
+
+                if (user != null)
                 {
-                    var issuer = configuration["Jwt:Issuer"];
-                    var audience = configuration["Jwt:Audience"];
-                    var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
-                    var signingCredentials = new SigningCredentials(
-                        new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha512Signature
-                    );
-
-                    var subject = new ClaimsIdentity(new[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                        new Claim(JwtRegisteredClaimNames.Email, user.UserName),
-                    });
-
-                    var expires = DateTime.UtcNow.AddMinutes(10);
-
-                    var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = subject,
-                        Expires = expires,
-                        Issuer = issuer,
-                        Audience = audience,
-                        SigningCredentials = signingCredentials
+                    //create claims details based on the user information
+                    var claims = new[] {
+                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                        new Claim("UserId", user.UserId.ToString()),
+                        new Claim("DisplayName", user.DisplayName),
+                        new Claim("UserName", user.UserName),
+                        new Claim("Email", user.Email)
                     };
 
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var token = tokenHandler.CreateToken(tokenDescriptor);
-                    var jwtToken = tokenHandler.WriteToken(token);
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                    var token = new JwtSecurityToken(
+                        _configuration["Jwt:Issuer"],
+                        _configuration["Jwt:Audience"],
+                        claims,
+                        expires: DateTime.UtcNow.AddMinutes(10),
+                        signingCredentials: signIn);
 
-                    return Ok(jwtToken);
+                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+                }
+                else
+                {
+                    return BadRequest("Invalid credentials");
                 }
             }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
-            return response;
+        private async Task<User> GetUser(string email, string password)
+        {
+            return await _context.UserInfo.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
     }
-
 }
