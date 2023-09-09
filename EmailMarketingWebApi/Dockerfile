@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["EmailMarketingWebApi/EmailMarketingWebApi.csproj", "EmailMarketingWebApi/"]
-RUN dotnet restore "EmailMarketingWebApi/EmailMarketingWebApi.csproj"
+COPY ["EmailMarketingWebApi.csproj", "."]
+RUN dotnet restore "./EmailMarketingWebApi.csproj"
 COPY . .
-WORKDIR "/src/EmailMarketingWebApi"
+WORKDIR "/src/."
 RUN dotnet build "EmailMarketingWebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

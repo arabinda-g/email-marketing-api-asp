@@ -1,8 +1,8 @@
 version: "3.9"  # optional since v1.27.0
 services:
   web_api:
-    image: web_api
-    container_name: email_marketing_api
+    image: email_marketing_web_api
+    container_name: email_marketing_web_api
     ports:
       - "5000:80"
   sql:
