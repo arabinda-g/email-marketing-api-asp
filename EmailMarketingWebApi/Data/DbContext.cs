@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EmailMarketingWebApi.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace EmailMarketingWebApi.Data
@@ -11,6 +12,8 @@ namespace EmailMarketingWebApi.Data
         }
 
         public DbSet<TodoItem> TodoItems { get; set; }
+        public virtual DbSet<UserInfo>? UserInfo { get; set; }
+
     }
 
 }
