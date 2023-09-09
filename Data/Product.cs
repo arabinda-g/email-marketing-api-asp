@@ -1,4 +1,4 @@
-﻿namespace WebApiEntityFrameworkDockerSqlServer.Data
+﻿namespace EmailMarketingWebApi.Data
 {
     public class Product
     {

@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
 
-namespace WebApiEntityFrameworkDockerSqlServer.Data
+namespace EmailMarketingWebApi.Data
 {
     public static class Seeder
     {

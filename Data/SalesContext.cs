@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace WebApiEntityFrameworkDockerSqlServer.Data
+namespace EmailMarketingWebApi.Data
 {
     public class SalesContext : DbContext
     {

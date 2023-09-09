@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "WebApiEntityFrameworkDockerSqlServer": {
+    "EmailMarketingWebApi": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

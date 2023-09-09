@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApiEntityFrameworkDockerSqlServer.Data;
+using EmailMarketingWebApi.Data;
 
-namespace WebApiEntityFrameworkDockerSqlServer.Controllers;
+namespace EmailMarketingWebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]

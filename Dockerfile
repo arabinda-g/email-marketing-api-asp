@@ -4,16 +4,16 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["WebApiEntityFrameworkDockerSqlServer.csproj", "."]
-RUN dotnet restore "./WebApiEntityFrameworkDockerSqlServer.csproj"
+COPY ["EmailMarketingWebApi.csproj", "."]
+RUN dotnet restore "./EmailMarketingWebApi.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "WebApiEntityFrameworkDockerSqlServer.csproj" -c Release -o /app/build
+RUN dotnet build "EmailMarketingWebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "WebApiEntityFrameworkDockerSqlServer.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "EmailMarketingWebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "WebApiEntityFrameworkDockerSqlServer.dll"]
+ENTRYPOINT ["dotnet", "EmailMarketingWebApi.dll"]

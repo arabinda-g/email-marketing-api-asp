@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WebApiEntityFrameworkDockerSqlServer.Data;
+using EmailMarketingWebApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
