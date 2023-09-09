@@ -8,6 +8,12 @@ ASP.NET Core application and SQL Server with Docker
 * [SQL Server 2017](https://hub.docker.com/r/microsoft/mssql-server-windows-express/)
 * [SQL Server Management Studio](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms)
 
+
+# Run on Docker
+docker build -t email_marketing_web_api .
+docker-compose up -d --build
+
+
 ## Getting Started
 
 1. Clone this repository
