@@ -13,6 +13,8 @@ namespace EmailMarketingWebApi.Data
 
         public DbSet<TodoItem> TodoItems { get; set; }
         public virtual DbSet<User>? Users { get; set; }
+        public virtual DbSet<Campaign>? Campaigns { get; set; }
+        
 
     }
 
