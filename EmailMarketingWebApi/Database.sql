@@ -55,3 +55,13 @@ CREATE TABLE Users (
     IsActive BIT NOT NULL DEFAULT 1
 );
 INSERT [dbo].[Users] ([UserId], [Username], [Email], [PasswordHash], [Salt], [FirstName], [LastName], [CreatedDate], [UpdatedDate], [IsActive]) VALUES (1, N'Admin', N'admin@marketcurrents.co', N'1', N'test', N'Admin', N'test', CAST(N'2023-09-13T13:33:44.000' AS DateTime), CAST(N'2023-09-13T13:33:51.240' AS DateTime), 1)
+
+
+CREATE TABLE Campaign (
+	CampaignId INT PRIMARY KEY IDENTITY(1,1),
+	Name NVARCHAR(50) NOT NULL,
+	EmailSubject NVARCHAR(100) NOT NULL,
+	Status NVARCHAR(50) NOT NULL,
+	CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
+	UpdatedDate DATETIME NOT NULL DEFAULT GETDATE()
+);
