@@ -1,4 +1,5 @@
 ﻿using EmailMarketingWebApi.Data;
+using EmailMarketingWebApi.Helpers;
 using EmailMarketingWebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +24,11 @@ namespace EmailMarketingWebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(User _userData)
+        public async Task<IActionResult> Post(UserCredential _userData)
         {
-            if (_userData != null && _userData.Email != null && _userData.Password != null)
+            if (_userData != null && _userData.Username != null && _userData.Password != null)
             {
-                var user = await GetUser(_userData.Email, _userData.Password);
+                var user = await GetUser(_userData.Username, _userData.Password);
 
                 if (user != null)
                 {
@@ -37,9 +38,10 @@ namespace EmailMarketingWebApi.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("UserId", user.UserId.ToString()),
-                        new Claim("DisplayName", user.DisplayName),
-                        new Claim("UserName", user.UserName),
-                        new Claim("Email", user.Email)
+                        new Claim("Username", user.Username),
+                        new Claim("Email", user.Email),
+                        new Claim("FirstName", user.FirstName),
+                        new Claim("LastName", user.LastName)
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -66,7 +68,37 @@ namespace EmailMarketingWebApi.Controllers
 
         private async Task<User> GetUser(string email, string password)
         {
-            return await _context.UserInfo.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            // Get the user from the database and compare the password hash
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                  return null;
+            }
+            else
+            {
+                //if (PasswordHelper.VerifyPassword(password, user.PasswordHash, user.Salt))
+                if (string.Equals(password, user.PasswordHash))
+                {
+                    return user;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public class UserCredential
+    {
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public UserCredential(string username, string password)
+        {
+            Username = username;
+            Password = password;
         }
     }
 }
