@@ -46,7 +46,6 @@ namespace EmailMarketingWebApi.Controllers
                 // Generate TrackingCode
                 string trackingCode = Guid.NewGuid().ToString();
 
-
                 Recipient recipient = new Recipient
                 {
                     CampaignId = campaign.CampaignId,
@@ -76,6 +75,10 @@ namespace EmailMarketingWebApi.Controllers
                 EmailQueue emailQueue = new EmailQueue
                 {
                     CampaignId = campaign.CampaignId,
+                    SenderEmail = _configuration["SmtpSettings:SenderEmail"],
+                    SenderName = _configuration["SmtpSettings:SenderName"],
+
+
                     //RecipientId = recipient.RecipientId,
                     RecipientEmail = recipient.Email,
                     FirstName = recipient.FirstName,
@@ -88,11 +91,6 @@ namespace EmailMarketingWebApi.Controllers
 
                 _context.EmailQueue.Add(emailQueue);
                 _context.SaveChanges();
-
-
-
-
-
 
             }
 
