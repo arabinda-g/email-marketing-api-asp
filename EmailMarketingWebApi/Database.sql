@@ -94,9 +94,9 @@ CREATE TABLE EmailQueue (
 -- EmailTracking Columns: id, email_id, campaign_id, email_address, action, ip_address, user_agent
 CREATE TABLE EmailTracking (
 	EmailTrackingId INT PRIMARY KEY IDENTITY(1,1),
-	EmailQueueId INT NOT NULL,
-	CampaignId INT NOT NULL,
-	EmailAddress NVARCHAR(100) NOT NULL,
+	EmailQueueId INT NULL,
+	CampaignId INT NULL,
+	EmailAddress NVARCHAR(100) NULL,
 	Action NVARCHAR(50) NOT NULL,
 	IpAddress NVARCHAR(50) NULL,
 	UserAgent NVARCHAR(100) NULL,

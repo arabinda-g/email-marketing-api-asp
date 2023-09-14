@@ -16,8 +16,7 @@ namespace EmailMarketingWebApi.Data
         public virtual DbSet<Campaign>? Campaigns { get; set; }
         public virtual DbSet<EmailQueue>? EmailQueue { get; set; }
         public virtual DbSet<Recipient>? Recipients { get; set; }
-        
-
+        public virtual DbSet<EmailTracking>? EmailTracking { get; set; }
     }
 
 }

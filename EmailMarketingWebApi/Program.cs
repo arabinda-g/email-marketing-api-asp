@@ -1,6 +1,7 @@
 using EmailMarketingWebApi.Data;
 using EmailMarketingWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -24,6 +25,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add email service
 builder.Services.AddSingleton<EmailService>();
+
+
+
+
+// Get the IP address of the client
+//builder.Services.Configure<ForwardedHeadersOptions>(options =>
+//{
+//    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+//});
+
+//builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
+
 
 
 
@@ -66,6 +81,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+//app.UseForwardedHeaders();
+
 
 
 // Add authentication before authorization middleware

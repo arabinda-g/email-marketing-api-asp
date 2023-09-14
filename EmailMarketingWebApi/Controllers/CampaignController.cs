@@ -27,7 +27,7 @@ namespace EmailMarketingWebApi.Controllers
         public IActionResult CreateCampaign([FromBody] CampaignFormData campaignFormData)
         {
             var baseUrl = _configuration["AppConfig:URL"];
-            
+
             // Create a new campaign
             Campaign campaign = new Campaign
             {
@@ -66,7 +66,7 @@ namespace EmailMarketingWebApi.Controllers
                 //    );
                 string replacedTemplate = campaignFormData.EmailMessage.Replace("{{recipient_first_name}}", recipient.FirstName);
                 replacedTemplate = replacedTemplate.Replace("{{recipient_last_name}}", recipient.LastName);
-                replacedTemplate = replacedTemplate.Replace("{{unsubscribe_link}}", baseUrl + "/unsubscribe?email=" + recipient.Email + "&token=" + trackingCode);
+                replacedTemplate = replacedTemplate.Replace("{{unsubscribe_link}}", baseUrl + "/unsubscribe/" + trackingCode + "/?email=" + recipient.Email);
                 replacedTemplate = replacedTemplate.Replace("{{email_tracker_tag}}", "<img src=\"{{email_tracker_url}}\" alt=\"\" width=\"1\" height=\"1\" style=\"display: block; width: 1px; height: 1px; border: none; margin: 0; padding: 0;\">");
                 replacedTemplate = replacedTemplate.Replace("{{email_tracker_url}}", baseUrl + "/tracker?token=" + trackingCode);
 
