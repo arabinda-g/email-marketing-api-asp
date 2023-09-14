@@ -3,7 +3,9 @@ using EmailMarketingWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EmailMarketingWebApi.Controllers
 {
@@ -98,15 +100,57 @@ namespace EmailMarketingWebApi.Controllers
         }
 
 
-        // Create a private function to change values in the campaign template
-        private string ReplaceCampaignTemplateValues(string template, string recipientFirstName, string recipientLastName)
+        //// Create a private function to change values in the campaign template
+        //private string ReplaceCampaignTemplateValues(string template, string recipientFirstName, string recipientLastName)
+        //{
+        //    string replacedTemplate = template.Replace("{{recipient_first_name}}", recipientFirstName);
+        //    replacedTemplate = replacedTemplate.Replace("{{recipient_last_name}}", recipientLastName);
+        //    replacedTemplate = replacedTemplate.Replace("{{unsubscribe_link}}", "https://www.example.com/unsubscribe");
+        //    replacedTemplate = replacedTemplate.Replace("{{email_tracker_tag}}", "<img src=\"{{email_tracker_url}}\" alt=\"\" width=\"1\" height=\"1\" style=\"display: block; width: 1px; height: 1px; border: none; margin: 0; padding: 0;\">");
+        //    replacedTemplate = replacedTemplate.Replace("{{email_tracker_url}}", "https://www.example.com/unsubscribe");
+        //    return replacedTemplate;
+        //}
+
+        // Create a function to show status of all campaigns
+        [HttpGet(Name = "GetCampaigns")]
+        public IActionResult GetCampaigns()
         {
-            string replacedTemplate = template.Replace("{{recipient_first_name}}", recipientFirstName);
-            replacedTemplate = replacedTemplate.Replace("{{recipient_last_name}}", recipientLastName);
-            replacedTemplate = replacedTemplate.Replace("{{unsubscribe_link}}", "https://www.example.com/unsubscribe");
-            replacedTemplate = replacedTemplate.Replace("{{email_tracker_tag}}", "<img src=\"{{email_tracker_url}}\" alt=\"\" width=\"1\" height=\"1\" style=\"display: block; width: 1px; height: 1px; border: none; margin: 0; padding: 0;\">");
-            replacedTemplate = replacedTemplate.Replace("{{email_tracker_url}}", "https://www.example.com/unsubscribe");
-            return replacedTemplate;
+            // Get all campaigns
+            var campaigns = _context.Campaigns.ToList();
+
+            List<CampaignStatusData> campaignStatusData = new List<CampaignStatusData>();
+
+
+
+            // Loop through each campaign and get the total number of recipients
+            foreach (Campaign campaign in campaigns)
+            {
+                campaignStatusData.Add(new CampaignStatusData
+                {
+                    CampaignId = campaign.CampaignId,
+                    Name = campaign.Name,
+                    EmailSubject = campaign.EmailSubject,
+                    Status = campaign.Status,
+                    CreatedDate = campaign.CreatedDate,
+                    UpdatedDate = campaign.UpdatedDate,
+                    //TotalEmails = _context.Recipients.Where(r => r.CampaignId == campaign.CampaignId).Count(),
+                    TotalEmails = _context.EmailQueue.Where(r => r.CampaignId == campaign.CampaignId).Count(),
+                    EmailsSent = _context.EmailQueue.Where(e => e.CampaignId == campaign.CampaignId && e.Status != "pending").Count(),
+                    EmailsOpened = _context.EmailQueue.Where(e => e.CampaignId == campaign.CampaignId && e.Status == "opened").Count()
+                });
+            }
+
+
+
+
+
+
+
+
+
+
+
+            return new ObjectResult(campaignStatusData);
         }
 
 
@@ -129,5 +173,18 @@ namespace EmailMarketingWebApi.Controllers
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+    }
+
+    public class CampaignStatusData
+    {
+        public int CampaignId { get; set; }
+        public string Name { get; set; }
+        public string EmailSubject { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
+        public int TotalEmails { get; set; }
+        public int EmailsSent { get; set; }
+        public int EmailsOpened { get; set; }
     }
 }
