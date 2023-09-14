@@ -79,7 +79,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// localhost:5214 will be redirected to localhost:7058 which is defined in the launchSettings.json file
+//app.UseHttpsRedirection();
+
+
 app.UseStaticFiles();
 //app.UseForwardedHeaders();
 
