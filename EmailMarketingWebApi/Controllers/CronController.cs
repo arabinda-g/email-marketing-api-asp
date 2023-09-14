@@ -47,6 +47,17 @@ namespace EmailMarketingWebApi.Controllers
                     emailQueue.SentDate = sentAt;
                     _context.SaveChanges();
 
+                    // Add a tracking record to the database
+                    EmailTracking emailTracking = new EmailTracking
+                    {
+                        EmailQueueId = emailQueue.EmailQueueId,
+                        CampaignId = emailQueue.CampaignId,
+                        EmailAddress = emailQueue.RecipientEmail,
+                        Action = "sent"
+                    };
+                    _context.EmailTracking.Add(emailTracking);
+                    _context.SaveChanges();
+
                     return new ObjectResult("Email sent to: " + recipientEmail);
                 }
                 catch (Exception ex)
