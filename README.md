@@ -10,8 +10,23 @@ ASP.NET Core application and SQL Server with Docker
 
 
 # Run on Docker
-docker build -t email_marketing_web_api .
+docker build -t email_marketing_web_api EmailMarketingWebApi
 docker-compose up -d --build
+
+## Run on Docker with single command
+
+### Method 1 (PowerShell)
+docker build -t email_marketing_web_api EmailMarketingWebApi; docker-compose up -d
+
+### Method 2 (Without build output)
+docker build -t email_marketing_web_api EmailMarketingWebApi | docker-compose up -d
+
+### Method 3 (Command Prompt, execute second command only if first command is successful)
+docker build -t email_marketing_web_api EmailMarketingWebApi && docker-compose up -d
+
+### Method 4 (Command Prompt, works since 2000)
+docker build -t email_marketing_web_api EmailMarketingWebApi & docker-compose up -d
+
 
 
 ## Getting Started
