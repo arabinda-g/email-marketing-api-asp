@@ -21,6 +21,7 @@
     <Folder Include="Interface\" />
     <Folder Include="Others\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>
