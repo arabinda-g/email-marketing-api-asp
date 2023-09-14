@@ -21,7 +21,7 @@ namespace EmailMarketingWebApi.Controllers
             _emailService = emailService;
         }
 
-        [HttpPost(Name = "SendEmail")]
+        [HttpGet("SendEmail", Name = "SendEmail")]
         public IActionResult SendEmail()
         {
             DateTime sentAt = DateTime.Now;
@@ -40,35 +40,61 @@ namespace EmailMarketingWebApi.Controllers
                 {
                     // Create and send an email
                     _emailService.SendEmail(to: recipientEmail, body: emailQueue.Message, subject: emailQueue.Subject);
-                    Console.WriteLine("Email sent to: " + recipientEmail + "<br>");
+                    Console.WriteLine("Email sent to: " + recipientEmail);
 
                     // Update status in the email_queue table
                     emailQueue.Status = "sent";
                     emailQueue.SentDate = sentAt;
                     _context.SaveChanges();
+
+                    return new ObjectResult("Email sent to: " + recipientEmail);
                 }
                 catch (Exception ex)
                 {
                     // Handle exceptions (e.g., logging)
                     Console.WriteLine(ex.Message);
 
-                    Console.WriteLine("Email not sent to: " + recipientEmail + "<br>");
+                    Console.WriteLine("Email not sent to: " + recipientEmail);
 
                     // Update status in the email_queue table
                     emailQueue.Status = "failed";
                     _context.SaveChanges();
+
+                    return new ObjectResult("Email not sent to: " + recipientEmail);
                 }
 
             }
             else
             {
                 Console.WriteLine("No emails to send.");
+                return new ObjectResult("No emails to send.");
             }
-            return new ObjectResult(emailQueue);
+            //return new ObjectResult(emailQueue);
         }
 
 
+        // Create a function to update campaign status by checking if all emails have been sent
+        [HttpGet("UpdateCampaignStatus", Name = "UpdateCampaignStatus")]
+        public IActionResult UpdateCampaignStatus()
+        {
+            // Get all campaigns
+            var campaigns = _context.Campaigns.ToList();
 
+            foreach (var campaign in campaigns)
+            {
+                // Get all emails in the email queue for this campaign
+                var emails = _context.EmailQueue.Where(e => e.CampaignId == campaign.CampaignId && e.Status == "pending").ToList();
+
+                // If there are no pending emails, update the campaign status to completed
+                if (emails.Count == 0)
+                {
+                    campaign.Status = "completed";
+                    _context.SaveChanges();
+                }
+            }
+
+            return new ObjectResult("Campaign status updated.");
+        }
 
 
 
