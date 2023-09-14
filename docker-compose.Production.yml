@@ -1,0 +1,17 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  web_api:
+    image: email_marketing_web_api
+    container_name: email_marketing_web_api
+    ports:
+      - "5001:80"
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+  sql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    ports:
+      - "5002:1433" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=test_123
