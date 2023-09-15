@@ -14,11 +14,15 @@ namespace EmailMarketingWebApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly EmailService _emailService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppService _appService;
 
-        public CronController(ApplicationDbContext context, EmailService emailService)
+        public CronController(ApplicationDbContext context, EmailService emailService, IHttpContextAccessor httpContextAccessor, AppService appService)
         {
             _context = context;
             _emailService = emailService;
+            _httpContextAccessor = httpContextAccessor;
+            _appService = appService;
         }
 
         [HttpGet("SendEmail", Name = "SendEmail")]
@@ -53,7 +57,11 @@ namespace EmailMarketingWebApi.Controllers
                         EmailQueueId = emailQueue.EmailQueueId,
                         CampaignId = emailQueue.CampaignId,
                         EmailAddress = emailQueue.RecipientEmail,
-                        Action = "sent"
+                        Action = "sent",
+
+                        // Store the IP address and user agent of the user who opened the email
+                        IpAddress = _appService.GetRemoteHostIpAddress(_httpContextAccessor.HttpContext).ToString(),
+                        UserAgent = _appService.GetRemoteHostUserAgent(_httpContextAccessor.HttpContext).ToString(),
                     };
                     _context.EmailTracking.Add(emailTracking);
                     _context.SaveChanges();
