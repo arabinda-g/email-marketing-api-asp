@@ -1,10 +1,9 @@
-﻿using Azure;
-using Azure.Core;
-using EmailMarketingWebApi.Data;
+﻿using EmailMarketingWebApi.Data;
 using EmailMarketingWebApi.Models;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Sockets;
+using System.Net;
+using EmailMarketingWebApi.Services;
 
 namespace EmailMarketingWebApi.Controllers
 {
@@ -15,12 +14,16 @@ namespace EmailMarketingWebApi.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         //private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppService _appService;
 
-        public EmailTrackingController(ApplicationDbContext context, IConfiguration configuration)
+        public EmailTrackingController(ApplicationDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AppService appService)
         {
             _context = context;
             _configuration = configuration;
             //_httpContext = httpContext;
+            _httpContextAccessor = httpContextAccessor;
+            _appService = appService;
         }
 
         // Add route for tracking email opens
@@ -46,10 +49,9 @@ namespace EmailMarketingWebApi.Controllers
                     EmailAddress = emailQueue.RecipientEmail,
                     Action = "opened",
 
-
                     // Store the IP address and user agent of the user who opened the email
-                    //IpAddress = _httpContext.Connection.RemoteIpAddress?.ToString(),
-                    //UserAgent = _httpContext.Request.Headers["User-Agent"]
+                    IpAddress = _appService.GetRemoteHostIpAddress(_httpContextAccessor.HttpContext).ToString(),
+                    UserAgent = _appService.GetRemoteHostUserAgent(_httpContextAccessor.HttpContext).ToString(),
                 };
                 _context.EmailTracking.Add(emailTracking);
                 _context.SaveChanges();
@@ -155,8 +157,10 @@ namespace EmailMarketingWebApi.Controllers
                     CampaignId = emailQueue.CampaignId,
                     EmailAddress = emailQueue.RecipientEmail,
                     Action = "unsubscribed",
-                    //IpAddress = _httpContext.Connection.RemoteIpAddress?.ToString(),
-                    //UserAgent = _httpContext.Request.Headers["User-Agent"]
+
+                    // Store the IP address and user agent of the user who opened the email
+                    IpAddress = _appService.GetRemoteHostIpAddress(_httpContextAccessor.HttpContext).ToString(),
+                    UserAgent = _appService.GetRemoteHostUserAgent(_httpContextAccessor.HttpContext).ToString(),
                 };
                 _context.EmailTracking.Add(emailTracking);
                 _context.SaveChanges();

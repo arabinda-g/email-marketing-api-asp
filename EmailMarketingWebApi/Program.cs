@@ -26,7 +26,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add email service
 builder.Services.AddSingleton<EmailService>();
 
-
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<AppService>();
 
 
 
@@ -105,6 +106,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 //app.UseForwardedHeaders();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseCors("AllowAllOrigins");
 
 
