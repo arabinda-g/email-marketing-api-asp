@@ -54,8 +54,9 @@ CREATE TABLE Users (
     UpdatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     IsActive BIT NOT NULL DEFAULT 1
 );
-INSERT [dbo].[Users] ([UserId], [Username], [Email], [PasswordHash], [Salt], [FirstName], [LastName], [CreatedDate], [UpdatedDate], [IsActive]) VALUES (1, N'Admin', N'admin@marketcurrents.co', N'1', N'test', N'Admin', N'test', CAST(N'2023-09-13T13:33:44.000' AS DateTime), CAST(N'2023-09-13T13:33:51.240' AS DateTime), 1)
-
+--INSERT [dbo].[Users] ([UserId], [Username], [Email], [PasswordHash], [Salt], [FirstName], [LastName], [CreatedDate], [UpdatedDate], [IsActive]) VALUES (1, N'Admin', N'admin@marketcurrents.co', N'1', N'test', N'Admin', N'test', CAST(N'2023-09-13T13:33:44.000' AS DateTime), CAST(N'2023-09-13T13:33:51.240' AS DateTime), 1)
+INSERT INTO [dbo].[Users] ([Username], [Email], [PasswordHash], [Salt], [FirstName], [LastName], [CreatedDate], [UpdatedDate], [IsActive])
+VALUES ('admin', 'admin@marketcurrents.co', '1', 'test', 'Admin', 'test', getdate(), getdate(), '1');
 
 CREATE TABLE Campaigns (
 	CampaignId INT PRIMARY KEY IDENTITY(1,1),

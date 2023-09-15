@@ -10,7 +10,7 @@ using System.Text;
 
 namespace EmailMarketingWebApi.Controllers
 {
-    [Route("api/token")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace EmailMarketingWebApi.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Post(UserCredential _userData)
         {
             if (_userData != null && _userData.Username != null && _userData.Password != null)
@@ -66,10 +66,10 @@ namespace EmailMarketingWebApi.Controllers
             }
         }
 
-        private async Task<User> GetUser(string email, string password)
+        private async Task<User> GetUser(string username, string password)
         {
             // Get the user from the database and compare the password hash
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user == null)
             {
                   return null;
