@@ -50,7 +50,8 @@ namespace EmailMarketingWebApi.Controllers
                         _configuration["Jwt:Issuer"],
                         _configuration["Jwt:Audience"],
                         claims,
-                        expires: DateTime.UtcNow.AddMinutes(10),
+                        //expires: DateTime.UtcNow.AddMinutes(10),
+                        expires: DateTime.UtcNow.AddDays(365),
                         signingCredentials: signIn);
 
                     return Ok(new JwtSecurityTokenHandler().WriteToken(token));
@@ -66,13 +67,55 @@ namespace EmailMarketingWebApi.Controllers
             }
         }
 
+
+        // Create a public function to get the user from the JWT token
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUser()
+        {
+            try
+            {
+                // Get the user ID from the JWT token
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+
+                // Get the user from the database
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == Convert.ToInt32(userId));
+
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                else
+                {
+                    return BadRequest("Invalid user");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Invalid user");
+                //return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private async Task<User> GetUser(string username, string password)
         {
             // Get the user from the database and compare the password hash
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user == null)
             {
-                  return null;
+                return null;
             }
             else
             {
