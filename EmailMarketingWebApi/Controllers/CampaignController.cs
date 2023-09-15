@@ -11,7 +11,7 @@ namespace EmailMarketingWebApi.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("Campaigns")]
     public class CampaignController
     {
         private readonly ApplicationDbContext _context;

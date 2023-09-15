@@ -29,6 +29,26 @@ builder.Services.AddSingleton<EmailService>();
 
 
 
+
+// Add CORS policy to allow any origin
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
+
+
+
+
+
+
+
+
 // Get the IP address of the client
 //builder.Services.Configure<ForwardedHeadersOptions>(options =>
 //{
@@ -85,7 +105,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 //app.UseForwardedHeaders();
-
+app.UseCors("AllowAllOrigins");
 
 
 // Add authentication before authorization middleware

@@ -19,9 +19,13 @@
 
   <ItemGroup>
     <Folder Include="Interface\" />
-    <Folder Include="Others\" />
     <Folder Include="ViewModels\" />
     <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\sample\recipients.csv" />
+    <None Include="wwwroot\sample\template.html" />
   </ItemGroup>
 
 </Project>
