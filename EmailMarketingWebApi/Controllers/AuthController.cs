@@ -69,7 +69,7 @@ namespace EmailMarketingWebApi.Controllers
 
 
         // Create a public function to get the user from the JWT token
-        [HttpGet("user")]
+        [HttpGet("verify")]
         public async Task<IActionResult> GetUser()
         {
             try
