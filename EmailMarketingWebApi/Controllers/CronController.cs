@@ -28,67 +28,79 @@ namespace EmailMarketingWebApi.Controllers
         [HttpGet("SendEmail", Name = "SendEmail")]
         public IActionResult SendEmail()
         {
-            DateTime sentAt = DateTime.Now;
+            // Send 10 emails at a time
+            int batchSize = 10;
+            int processed = 0;
 
-            //EmailQueue emailQueue = EmailQueue.Where((x) => x.Status == "pending").FirstOrDefault();
-            // Select the first email in the queue that has a status of "pending"
-            //EmailQueue emailQueue = _context.EmailQueue.Where((x) => x.Status == "pending").FirstOrDefault();
-            EmailQueue emailQueue = _context.EmailQueue.FirstOrDefault(e => e.Status == "pending");
-
-            if (emailQueue != null)
+            for (int i = 0; i <= batchSize; i++)
             {
-                string recipientEmail = emailQueue.RecipientEmail;
-                string recipientName = emailQueue.FirstName + " " + emailQueue.LastName;
+                // Get the current time
+                DateTime sentAt = DateTime.Now;
 
-                try
+                //EmailQueue emailQueue = EmailQueue.Where((x) => x.Status == "pending").FirstOrDefault();
+                // Select the first email in the queue that has a status of "pending"
+                //EmailQueue emailQueue = _context.EmailQueue.Where((x) => x.Status == "pending").FirstOrDefault();
+                EmailQueue emailQueue = _context.EmailQueue.FirstOrDefault(e => e.Status == "pending");
+
+                if (emailQueue != null)
                 {
-                    // Create and send an email
-                    _emailService.SendEmail(to: recipientEmail, body: emailQueue.Message, subject: emailQueue.Subject);
-                    Console.WriteLine("Email sent to: " + recipientEmail);
+                    string recipientEmail = emailQueue.RecipientEmail;
+                    string recipientName = emailQueue.FirstName + " " + emailQueue.LastName;
 
-                    // Update status in the email_queue table
-                    emailQueue.Status = "sent";
-                    emailQueue.SentDate = sentAt;
-                    _context.SaveChanges();
-
-                    // Add a tracking record to the database
-                    EmailTracking emailTracking = new EmailTracking
+                    try
                     {
-                        EmailQueueId = emailQueue.EmailQueueId,
-                        CampaignId = emailQueue.CampaignId,
-                        EmailAddress = emailQueue.RecipientEmail,
-                        Action = "sent",
+                        // Create and send an email
+                        _emailService.SendEmail(to: recipientEmail, body: emailQueue.Message, subject: emailQueue.Subject);
+                        Console.WriteLine("Email sent to: " + recipientEmail);
 
-                        // Store the IP address and user agent of the user who opened the email
-                        IpAddress = _appService.GetRemoteHostIpAddress(_httpContextAccessor.HttpContext).ToString(),
-                        UserAgent = _appService.GetRemoteHostUserAgent(_httpContextAccessor.HttpContext).ToString(),
-                    };
-                    _context.EmailTracking.Add(emailTracking);
-                    _context.SaveChanges();
+                        // Update status in the email_queue table
+                        emailQueue.Status = "sent";
+                        emailQueue.SentDate = sentAt;
+                        _context.SaveChanges();
 
-                    return new ObjectResult("Email sent to: " + recipientEmail);
+                        // Add a tracking record to the database
+                        EmailTracking emailTracking = new EmailTracking
+                        {
+                            EmailQueueId = emailQueue.EmailQueueId,
+                            CampaignId = emailQueue.CampaignId,
+                            EmailAddress = emailQueue.RecipientEmail,
+                            Action = "sent",
+
+                            // Store the IP address and user agent of the user who opened the email
+                            IpAddress = _appService.GetRemoteHostIpAddress(_httpContextAccessor.HttpContext).ToString(),
+                            UserAgent = _appService.GetRemoteHostUserAgent(_httpContextAccessor.HttpContext).ToString(),
+                        };
+                        _context.EmailTracking.Add(emailTracking);
+                        _context.SaveChanges();
+
+                        //return new ObjectResult("Email sent to: " + recipientEmail);
+                        processed++;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle exceptions (e.g., logging)
+                        Console.WriteLine(ex.Message);
+
+                        Console.WriteLine("Email not sent to: " + recipientEmail);
+
+                        // Update status in the email_queue table
+                        emailQueue.Status = "failed";
+                        _context.SaveChanges();
+
+                        //return new ObjectResult("Email not sent to: " + recipientEmail);
+                    }
+
                 }
-                catch (Exception ex)
+                else
                 {
-                    // Handle exceptions (e.g., logging)
-                    Console.WriteLine(ex.Message);
-
-                    Console.WriteLine("Email not sent to: " + recipientEmail);
-
-                    // Update status in the email_queue table
-                    emailQueue.Status = "failed";
-                    _context.SaveChanges();
-
-                    return new ObjectResult("Email not sent to: " + recipientEmail);
+                    Console.WriteLine("No emails to send.");
+                    //return new ObjectResult("No emails to send.");
                 }
+                //return new ObjectResult(emailQueue);
+            }
 
-            }
-            else
-            {
-                Console.WriteLine("No emails to send.");
-                return new ObjectResult("No emails to send.");
-            }
-            //return new ObjectResult(emailQueue);
+            // Return the number of emails processed
+            return new ObjectResult("Emails processed: " + processed);
         }
 
 
